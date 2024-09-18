@@ -8,6 +8,11 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 
    ```bash
    npm install
+   npm i -g expo-cli
+   npm i react-native-vector-icons
+   npm i react-native-google-signin/google-signin
+   npm i expo-av
+   npm i react-native-app-intro-slider
    ```
 
 2. Start the app
