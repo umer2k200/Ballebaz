@@ -13,6 +13,7 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    npm i react-native-google-signin/google-signin
    npm i expo-av
    npm i react-native-app-intro-slider
+   npm i expo-image-picker
    ```
 
 2. Start the app

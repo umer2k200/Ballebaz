@@ -36,7 +36,12 @@ const RootLayout = () => {
             <Stack.Screen name='TeamOwnerViewPlayers/index' options={{headerShown:false}} />
             <Stack.Screen name='TeamOwnerMoreNavbar/index' options={{headerShown:false}} />
 
-            {/* will use stack after login signup */}
+            {/* Coach */}
+            <Stack.Screen name='CoachHomePage/index' options={{headerShown:false}} />
+            <Stack.Screen name='CoachAssignedPlayers/index' options={{headerShown:false}} />
+            <Stack.Screen name='CoachManage&AssignDrills/index' options={{headerShown:false}} />
+            <Stack.Screen name='CoachUpcomingTrainingSessions/index' options={{headerShown:false}} />
+            <Stack.Screen name='CoachSettings/index' options={{headerShown:false}} />
 
         </Stack>
     )
