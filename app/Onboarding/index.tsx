@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   },
   slideTitle: {
     fontWeight: 'bold',
-    color: 'COLORS.title',
+    color: 'darkgrey',
     fontSize: SIZES.h1,
   },
   slideDescription: {

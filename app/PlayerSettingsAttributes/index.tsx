@@ -18,6 +18,7 @@ export default function PlayerAttributesScreen() {
   const router = useRouter();
 
   return (
+    <>
     <ScrollView style={styles.container}>
       {/* Back Button */}
       <TouchableOpacity style={styles.backButton} onPress={() => router.push('/PlayerSettings')}>
@@ -131,6 +132,7 @@ export default function PlayerAttributesScreen() {
         <Text style={styles.saveButtonText}>Save Attributes</Text>
       </TouchableOpacity>
     </ScrollView>
+    </>
   );
 }
 
@@ -148,6 +150,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
     marginTop: 15,
+    left:10,
   },
   section: {
     marginBottom: 30,
@@ -212,7 +215,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 50,
     alignItems: 'center',
-    marginVertical: 20,
+    marginTop: -28,
   },
   saveButtonText: {
     fontSize: 18,
@@ -221,7 +224,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: 'absolute',
-    left: 1,
+    left: 0,
     padding: 10,
     marginTop: 15,
   },

@@ -15,6 +15,7 @@ const RootLayout = () => {
             <Stack.Screen name='Onboarding/index' options={{headerShown: false}} />
             <Stack.Screen name='Login/index' options={{headerShown: false}} />
             <Stack.Screen name='Signup/index' options={{title: 'Back to login'}} />
+            {/* Player */}
             <Stack.Screen name='PlayerHomePage/index' options={{headerShown:false}} />
             <Stack.Screen name='PlayerDrills/index' options={{headerShown:false}} />
             <Stack.Screen name='PlayerFitness/index' options={{headerShown:false}} />
@@ -23,6 +24,17 @@ const RootLayout = () => {
             <Stack.Screen name='PlayerSettings/index' options={{headerShown:false}} />
             <Stack.Screen name='PlayerSettingsAttributes/index' options={{headerShown:false}} />
             <Stack.Screen name='PlayerUpcomingMatches/index' options={{headerShown:false}} />
+            {/* Team Owner */}
+            <Stack.Screen name='TeamOwnerBookGround/index' options={{headerShown:false}} />
+            <Stack.Screen name='TeamOwnerCommunity/index' options={{headerShown:false}} />
+            <Stack.Screen name='TeamOwnerGenerateKit/index' options={{headerShown:false}} />
+            <Stack.Screen name='TeamOwnerHighlightsPage/index' options={{headerShown:false}} />
+            <Stack.Screen name='TeamOwnerHireCoach/index' options={{headerShown:false}} />
+            <Stack.Screen name='TeamOwnerHomeScreen/index' options={{headerShown:false}} />
+            <Stack.Screen name='TeamOwnerTeamsRanking/index' options={{headerShown:false}} />
+            <Stack.Screen name='TeamOwnerUpcomingMatches/index' options={{headerShown:false}} />
+            <Stack.Screen name='TeamOwnerViewPlayers/index' options={{headerShown:false}} />
+            <Stack.Screen name='TeamOwnerMoreNavbar/index' options={{headerShown:false}} />
 
             {/* will use stack after login signup */}
 
