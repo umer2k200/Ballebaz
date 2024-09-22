@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useRouter } from "expo-router";
-import { useNavigation } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -9,9 +8,10 @@ import {
   ScrollView,
   TouchableOpacity,
   Modal,
+  TextInput,
 } from "react-native";
 
-// Define the Player type
+// Define the Player and Drill types
 type Player = {
   name: string;
   position: string;
@@ -22,83 +22,122 @@ type Player = {
   bowlingEconomy: number;
   session: string;
   injury: string;
+  notes?:string;
+
+};
+
+type Drill = {
+  id: number;
+  name: string;
 };
 
 export default function CoachManageandAssignDrills() {
   const router = useRouter();
-  const navigation = useNavigation();
 
   const assignedPlayers: Player[] = [
     {
       name: "Sanaullah Momin",
-      position: 'Batsman',
-        battingStyle: 'Right-hand bat',
-        bowlingStyle: 'Right-arm medium',
-        Team: 'Pakistan',
-        battingAverage: 50.06,
-        bowlingEconomy: 6.08,
+      position: "Batsman",
+      battingStyle: "Right-hand bat",
+      bowlingStyle: "Right-arm medium",
+      Team: "Pakistan",
+      battingAverage: 50.06,
+      bowlingEconomy: 6.08,
       session: "Cover Drive Session",
-      injury: 'none',
+      injury: "none",
+      notes: "Needs to work on his cover drive",
     },
     {
       name: "Ibrahim Saqib",
-        position: 'Bowler',
-            battingStyle: 'Left-hand bat',
-            bowlingStyle: 'Left-arm fast',
-            Team: 'Pakistan',
-            battingAverage: 30.18,
-            bowlingEconomy: 5.20,
+      position: "Bowler",
+      battingStyle: "Left-hand bat",
+      bowlingStyle: "Left-arm fast",
+      Team: "Pakistan",
+      battingAverage: 30.18,
+      bowlingEconomy: 5.2,
       session: "Fielding Session & Bowling",
-      injury: 'none',
-      
+      injury: "none",
+      notes: "Needs to work on his fielding and bowling",
     },
     {
       name: "Umar Zeeshan",
-      position: 'Batsman',
-        battingStyle: 'Right-hand bat',
-        bowlingStyle: 'Right-arm medium',
-        Team: 'Pakistan',
-        battingAverage: 40.67,
-        bowlingEconomy: 7.96,
+      position: "Batsman",
+      battingStyle: "Right-hand bat",
+      bowlingStyle: "Right-arm medium",
+      Team: "Pakistan",
+      battingAverage: 40.67,
+      bowlingEconomy: 7.96,
       session: "Batting Practice",
-      injury: 'right shoulder dislocated',
+      injury: "right shoulder dislocated",
+      notes: "Needs to work on Batting",
     },
     {
       name: "Ahsan Iqbal",
-      position: 'Bowler',
-        battingStyle: 'Right-hand bat',
-        bowlingStyle: 'Right-arm fast',
-        Team: 'Pakistan',
-        battingAverage: 35.23,
-        bowlingEconomy: 6.23,
+      position: "Bowler",
+      battingStyle: "Right-hand bat",
+      bowlingStyle: "Right-arm fast",
+      Team: "Pakistan",
+      battingAverage: 35.23,
+      bowlingEconomy: 6.23,
       session: "Batting Practice",
-      injury: 'leg injured',
+      injury: "leg injured",
+      notes: "Needs to work on Pull"
     },
     {
       name: "Nasir Mehmood",
-        position: 'Batsman',
-            battingStyle: 'Right-hand bat',
-            bowlingStyle: 'Right-arm medium',
-            Team: 'Pakistan',
-            battingAverage: 45.12,
-            bowlingEconomy: 6.57,
+      position: "Batsman",
+      battingStyle: "Right-hand bat",
+      bowlingStyle: "Right-arm medium",
+      Team: "Pakistan",
+      battingAverage: 45.12,
+      bowlingEconomy: 6.57,
       session: "Batting Practice",
-      injury: 'none',
+      injury: "none",
+      notes: "Needs to work on Cover drive",
     },
   ];
 
+  const drills: Drill[] = [
+    { id: 1, name: "Batting Practice" },
+    { id: 2, name: "Bowling Session" },
+    { id: 3, name: "Fielding Drills" },
+    { id: 4, name: "Fitness Training" },
+  ];
+
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null); // Specify type for selectedPlayer
+  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+  const [assignedDrill, setAssignedDrill] = useState<string | null>(null);
+  const [drillDetails, setDrillDetails] = useState({
+    duration: "",
+    intensity: "",
+    notes: "",
+  });
 
   const handlePlayerPress = (player: Player) => {
-    // Specify type for player parameter
     setSelectedPlayer(player);
     setModalVisible(true);
+  };
+
+  const handleDrillSelection = (drillName: string) => {
+    setAssignedDrill(drillName);
+  };
+
+  const handleAssignDrill = () => {
+    if (selectedPlayer && assignedDrill) {
+      setSelectedPlayer({
+        ...selectedPlayer,
+        session: assignedDrill,
+        notes: drillDetails.notes,
+      });
+      setModalVisible(false);
+      setDrillDetails({ duration: "", intensity: "", notes: "" });
+    }
   };
 
   const closeModal = () => {
     setModalVisible(false);
     setSelectedPlayer(null);
+    setDrillDetails({ duration: "", intensity: "", notes: "" });
   };
 
   return (
@@ -122,14 +161,19 @@ export default function CoachManageandAssignDrills() {
               <View style={styles.playerDetails}>
                 <Text style={styles.playerName}>{player.name}</Text>
                 <Text style={styles.sessionDetails}>{player.session}</Text>
-                <Text style={styles.positionDetails}>Position: {player.position}</Text>
+                <Text style={styles.positionDetails}>
+                  Position: {player.position}
+                </Text>
+                <Text style={styles.notesDetails}>
+                  Notes: {player.notes ? player.notes : "No notes yet"}
+                </Text>
               </View>
             </View>
           </TouchableOpacity>
         ))}
       </ScrollView>
 
-      {/* Player Details Modal */}
+      {/* Drills Selection Modal */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -140,31 +184,54 @@ export default function CoachManageandAssignDrills() {
           <View style={styles.modalView}>
             {selectedPlayer && (
               <>
-                <Text style={styles.modalTitle}>{selectedPlayer.name}</Text>
-                <Text style={styles.modalDetails}>
-                  Position: {selectedPlayer.position}
+                <Text style={styles.modalTitle}>
+                  {selectedPlayer.name}
                 </Text>
-                <Text style={styles.modalDetails}>
-                    Batting Style: {selectedPlayer.battingStyle}
-                </Text>
-                <Text style={styles.modalDetails}>
-                   Bowling Style: {selectedPlayer.bowlingStyle}
-                </Text>
-                <Text style={styles.modalDetails}>
-                    Team: {selectedPlayer.Team}
-                </Text>
-                <Text style={styles.modalDetails}>
-                    Batting avg: {selectedPlayer.battingAverage}
-                </Text>
-                <Text style={styles.modalDetails}>
-                    Bowling economy: {selectedPlayer.bowlingEconomy}
-                </Text>
-                <Text style={styles.modalDetails}>
-                  Training session: {selectedPlayer.session}
-                </Text>
-                <Text style={styles.modalDetails}>
-                  Injury: {selectedPlayer.injury}
-                </Text>
+
+                {drills.map((drill) => (
+                  <TouchableOpacity
+                    key={drill.id}
+                    style={styles.drillOption}
+                    onPress={() => handleDrillSelection(drill.name)}
+                  >
+                    <Text style={styles.drillText}>{drill.name}</Text>
+                  </TouchableOpacity>
+                ))}
+                <TextInput
+                  style={styles.input}
+                  placeholder="Duration (mins)"
+                  placeholderTextColor="#aaa"
+                  value={drillDetails.duration}
+                  onChangeText={(text) =>
+                    setDrillDetails({ ...drillDetails, duration: text })
+                  }
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Intensity (e.g. low, medium, high)"
+                  placeholderTextColor="#aaa"
+                  value={drillDetails.intensity}
+                  onChangeText={(text) =>
+                    setDrillDetails({ ...drillDetails, intensity: text })
+                  }
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Notes (optional)"
+                  placeholderTextColor="#aaa"
+                  value={drillDetails.notes}
+                  onChangeText={(text) =>
+                    setDrillDetails({ ...drillDetails, notes: text })
+                  }
+                />
+
+
+                <TouchableOpacity
+                  style={styles.assignButton}
+                  onPress={handleAssignDrill}
+                >
+                  <Text style={styles.assignButtonText}>Assign Drill</Text>
+                </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.closeButton}
                   onPress={closeModal}
@@ -179,13 +246,14 @@ export default function CoachManageandAssignDrills() {
 
       {/* Fancy Navbar */}
       <View style={styles.navbar}>
-        
-
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push("/CoachAssignedPlayers")}>
-            <Image
-                source={require("@/assets/images/group.png")}
-                style={styles.navIcon}
-            />
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => router.push("/CoachAssignedPlayers")}
+        >
+          <Image
+            source={require("@/assets/images/group.png")}
+            style={styles.navIcon}
+          />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -243,7 +311,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   titleContainer: {
-    marginTop:70,
+    marginTop: 70,
     marginBottom: 40,
     alignItems: "center",
   },
@@ -261,16 +329,16 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   playerInfoContainer: {
-    flexDirection: "row", // Align image and text horizontally
+    flexDirection: "row",
     alignItems: "center",
   },
   playerImage: {
     width: 80,
     height: 80,
-    marginRight: 10, // Add space between the image and the text
+    marginRight: 10,
   },
   playerDetails: {
-    flex: 1, // Take up the remaining space
+    flex: 1,
   },
   playerName: {
     color: "#fff",
@@ -284,43 +352,70 @@ const styles = StyleSheet.create({
     color: "#ccc",
     fontSize: 12,
   },
+  notesDetails: {
+    color: "#ccc",
+    fontSize: 12,
+  },
   modalContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.8)", // Semi-transparent background
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
   },
   modalView: {
     width: "90%",
     backgroundColor: "#1e1e1e",
     borderRadius: 20,
-    padding: 35,
+    padding: 5,
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
   },
   modalTitle: {
     fontSize: 24,
     color: "#fff",
-    marginBottom: 15,
+    marginVertical: 15,
   },
-  modalDetails: {
-    color: "#aaa",
+  drillOption: {
+    backgroundColor: "#005B41",
+    padding: 10,
+    borderRadius: 10,
+    marginVertical: 10,
+    width: "60%",
+    alignItems: "center",
+  },
+  drillText: {
+    color: "#fff",
+    fontSize: 14,
+  },
+  input: {
+    backgroundColor: "#333",
+    borderRadius: 10,
+    color: "#fff",
+    padding: 10,
+    marginTop: 10,
+    width: "80%",
+  },
+  assignButton: {
+    backgroundColor: "#005B41",
+    borderRadius: 10,
+    padding: 10,
+    width: 150,
+    alignItems: "center",
+    marginTop: 20,
+  },
+  assignButtonText: {
+    color: "#fff",
     fontSize: 16,
-    marginBottom: 20,
-    textAlign: "center",
   },
   closeButton: {
     backgroundColor: "#005B41",
     borderRadius: 10,
     padding: 10,
-    width:100,
+    width: 80,
     justifyContent: "center",
     alignItems: "center",
     elevation: 2,
+    marginTop: 10,
+    marginBottom: 20,
   },
   closeButtonText: {
     color: "#fff",

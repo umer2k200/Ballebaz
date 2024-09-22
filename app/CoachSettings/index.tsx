@@ -39,6 +39,18 @@ export default function CoachSettings() {
         />
       </View>
 
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Re-type Password</Text>
+        <TextInput
+          style={styles.input}
+          value={password}
+          onChangeText={setPassword}
+          placeholder="Enter your password again"
+          secureTextEntry={true}
+          placeholderTextColor="#999"
+        />
+      </View>
+
       {/* Phone Number Input */}
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Phone Number</Text>
@@ -128,7 +140,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'darkgrey', // Light text color for dark mode
     textAlign: 'center',
-    marginBottom: 20,
+    marginVertical: 20,
   },
   inputContainer: {
     marginBottom: 20,
@@ -152,8 +164,8 @@ const styles = StyleSheet.create({
   },
   updateButton: {
     backgroundColor: '#005B41', // Teal color for the button
-    padding: 15,
-    marginVertical: 7,
+    padding: 10,
+    marginTop: 20,
     width: '60%',
     justifyContent: 'center',
     alignSelf: 'center',
@@ -162,14 +174,14 @@ const styles = StyleSheet.create({
     //marginBottom: 20,
   },
   updateButtonText: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#fff',
     fontWeight: 'bold',
   },
   logoutButton: {
     backgroundColor: '#e74c3c',
-    padding: 15,
-    marginVertical: 7,
+    padding: 10,
+    marginTop: 20,
     borderRadius: 50,
     width: '60%',
     justifyContent: 'center',
@@ -177,7 +189,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logoutButtonText: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#fff',
     fontWeight: 'bold',
   },
