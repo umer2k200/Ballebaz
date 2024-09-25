@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   closeButton: {
-    backgroundColor: "#005B41",
+    backgroundColor: "#e74c3c",
     borderRadius: 10,
     padding: 10,
     width: 80,

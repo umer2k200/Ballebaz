@@ -43,6 +43,13 @@ const RootLayout = () => {
             <Stack.Screen name='CoachUpcomingTrainingSessions/index' options={{headerShown:false}} />
             <Stack.Screen name='CoachSettings/index' options={{headerShown:false}} />
 
+            {/* Club Owner */}
+            <Stack.Screen name='ClubOwnerHomePage/index' options={{headerShown:false}} />
+            <Stack.Screen name='ClubOwnerGroundBookings/index' options={{headerShown:false}} />
+            <Stack.Screen name='ClubOwnerRevenue/index' options={{headerShown:false}} />
+            <Stack.Screen name='ClubOwnerSettings/index' options={{headerShown:false}} />
+            <Stack.Screen name='ClubOwnerUmpireBookings/index' options={{headerShown:false}} />
+
         </Stack>
     )
 }
