@@ -52,6 +52,12 @@ const RootLayout = () => {
             <Stack.Screen name='ClubOwnerSettings/index' options={{headerShown:false}} />
             <Stack.Screen name='ClubOwnerUmpireBookings/index' options={{headerShown:false}} />
 
+            {/* Umpire */}
+            <Stack.Screen name='UmpireHome/index' options={{headerShown:false}} />
+            <Stack.Screen name='UmpireSettings/index' options={{headerShown:false}} />
+            <Stack.Screen name='UmpireUpcomingMatches/index' options={{headerShown:false}} />
+
+            <Stack.Screen name='MatchDetails/index' options={{headerShown:false}} />
         </Stack>
     )
 }
