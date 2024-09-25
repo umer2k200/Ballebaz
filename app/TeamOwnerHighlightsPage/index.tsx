@@ -1,84 +1,55 @@
 import React from 'react';
-import { useRouter } from "expo-router";
-import { useNavigation } from '@react-navigation/native';
-import { View, Text, StyleSheet, Image, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, ScrollView, Text, Image, TouchableOpacity } from 'react-native';
+import { Video } from 'expo-av'; // Using 'expo-av' for video playback
+import { useRouter } from 'expo-router';
+import { Dimensions } from 'react-native';
 
-export default function TeamOwnerHighlightsPage() {
+export default function PlayerHighlightsScreen() {
   const router = useRouter();
-  const navigation = useNavigation();
+  const screenWidth = Dimensions.get('window').width;
 
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={() => router.push('/TeamOwnerHomeScreen')}>
           <Image source={require('@/assets/images/back_arrow.png')} style={styles.backIcon} />
         </TouchableOpacity>
         <Text style={styles.headerText}>Match Highlights</Text>
       </View>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        
+        {/* First Video Container */}
+        <View style={styles.videoContainer}>
+          <Text style={styles.videoTitle}>Highlight 1</Text>
+          {/* Uncomment the Video component when you have the video */}
+          {/* <Video
+            source={require('@/assets/images/video1.mp4')} // Path to the first video
+            rate={1.0}
+            volume={1.0}
+            isMuted={false}
+            shouldPlay={true}
+            useNativeControls
+            style={styles.video}
+          /> */}
+        </View>
 
-      {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search"
-          placeholderTextColor="#aaa"
-        />
-      </View>
-
-      {/* Drills List */}
-      <ScrollView contentContainerStyle={styles.drillList}>
-        {/* Drill Item 1 */}
-        <TouchableOpacity style={styles.drillItem}>
-          <Image source={require('../../assets/images/d1.jpg')} style={styles.drillThumbnail} />
-          <View style={styles.drillDetails}>
-            <Text style={styles.drillTitle}>How to bowl Inswing - Brett Lee</Text>
-          </View>
-        </TouchableOpacity>
-
-        {/* Drill Item 2 */}
-        <TouchableOpacity style={styles.drillItem}>
-          <Image source={require('../../assets/images/d2.jpg')} style={styles.drillThumbnail} />
-          <View style={styles.drillDetails}>
-            <Text style={styles.drillTitle}>How to inswing tapeball - Arsl</Text>
-          </View>
-        </TouchableOpacity>
-
-        {/* Drill Item 3 */}
-        <TouchableOpacity style={styles.drillItem}>
-          <Image source={require('../../assets/images/d3.jpg')} style={styles.drillThumbnail} />
-          <View style={styles.drillDetails}>
-            <Text style={styles.drillTitle}>How to put reverse swing - cricket tag</Text>
-          </View>
-        </TouchableOpacity>
+        {/* Second Video Container */}
+        <View style={styles.videoContainer}>
+          <Text style={styles.videoTitle}>Highlight 2</Text>
+          {/* Uncomment the Video component when you have the video */}
+          {/* <Video
+            source={require('@/assets/images/video2.mp4')} // Path to the second video
+            rate={1.0}
+            volume={1.0}
+            isMuted={false}
+            shouldPlay={false}
+            useNativeControls
+            style={styles.video}
+          /> */}
+        </View>
       </ScrollView>
 
-      {/* Navbar */}
-      <View style={styles.navbar}>
-        <View style={styles.navItem}>
-          <View style={styles.highlight}>
-            <Image
-              source={require('@/assets/images/drills.png')}
-              style={styles.navIcon}
-            />
-          </View>
-        </View>
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/PlayerFitness')}>
-          <Image source={require('@/assets/images/fitness.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/PlayerHomePage')}>
-          <Image source={require('@/assets/images/home.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/PlayerCommunity')}>
-          <Image source={require('@/assets/images/group.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/PlayerHighlightsPage')}>
-          <Image source={require('@/assets/images/cloud.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/PlayerSettings')}>
-          <Image source={require('@/assets/images/settings.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-      </View>
     </View>
   );
 }
@@ -86,108 +57,57 @@ export default function TeamOwnerHighlightsPage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#121212', // Dark background for the drills section
+    backgroundColor: '#121212', // Light grayish background for a professional look
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingTop: 55,
-    backgroundColor: '#005B41',
+    paddingBottom: 20,
   },
   backIcon: {
     width: 24,
     height: 24,
-    marginLeft:15,
+    marginLeft: 15,
     tintColor: '#fff',
   },
   headerText: {
     flex: 1,
-    fontSize: 30,
-    paddingRight:35,
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#fff',
     textAlign: 'center',
+    marginRight: 30,
   },
-  searchContainer: {
-    paddingHorizontal: 15,
-    paddingVertical: 25,
-    backgroundColor: '#005B41',
+  scrollContainer: {
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 100, // Add extra padding to avoid content being hidden behind the navbar
   },
-  searchInput: {
+  videoContainer: {
     backgroundColor: '#1e1e1e',
-    borderRadius: 20,
-    height:35,
-    paddingHorizontal: 15,
-    color: '#000',
-  },
-  drillList: {
-    paddingHorizontal: 15,
-    paddingVertical:10
-  },
-  drillItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#1c1c1c',
-    padding: 15,
-    marginVertical: 5,
     borderRadius: 10,
-  },
-  drillThumbnail: {
-    width: 100,
-    height: 50,
-    borderRadius: 10,
-  },
-  drillDetails: {
-    flex: 1,
-    marginLeft: 20,
-  },
-  drillTitle: {
-    fontSize: 16,
-    fontWeight: 'normal',
-    color: '#fff',
-  },
-  navbar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: '#1e1e1e', // Dark navbar background
-    paddingVertical: 7,
-    borderTopLeftRadius: 50, // Extra rounded top corners for a sleek look
-    borderTopRightRadius: 50,
+    padding: 5,
+    marginVertical: 10,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 15,
-    elevation: 20,
-    paddingHorizontal:20,
-  },
-  navItem: {
-    alignItems: 'center',
-    padding: 10,
-  },
-  navIcon: {
-    width: 25, // Slightly larger icons
-    height: 25,
-    tintColor: '#fff', // Light icon color
-  },
-  highlight: {
-    position: 'absolute',
-    bottom: 30, // Slightly raised pop-up effect
-    backgroundColor: '#005B41', // Teal highlight
-    borderRadius: 50,
-    width: 70,
-    height: 70,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#00e676', // Bright shadow effect for the highlight
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.6,
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.1,
     shadowRadius: 10,
-    elevation: 10,
-    borderColor: '#1e1e1e',  // Darker border color for contrast
-    borderWidth: 5,
+    elevation: 5, // Adds shadow for Android
+    width: '100%', // Ensures video container covers 100% of the screen width
+    height: 250, // Set a fixed height for consistency (adjust as needed)
+    alignItems: 'center',
+  },
+  videoTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: 'white',
+  },
+  video: {
+    width: '100%',
+    aspectRatio: 16 / 9, // Set a 16:9 aspect ratio for responsive video scaling
+    borderRadius: 10,
   },
 });

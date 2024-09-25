@@ -1,82 +1,45 @@
 import React from 'react';
 import { useRouter } from "expo-router";
-import { useNavigation } from '@react-navigation/native';
-import { View, Text, StyleSheet, Image, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
 
-export default function TeamOwnerCommunity() {
+export default function CommunityScreen() {
   const router = useRouter();
-  const navigation = useNavigation();
+
+  // Sample community messages
+  const messages = [
+    { username: 'Eagles', message: 'Had a great game today. Won bu 10 Wickets' },
+    { username: 'Markhors', message: 'Team fought well.' },
+    { username: 'Thunders', message: 'Any team available for sunday?' },
+    { username: 'Kings', message: 'Our match got cancelled, we have a ground booking on Saturday 8-12 in Pasban. Any team available?' },
+    
+  ];
 
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={() => router.push('/TeamOwnerHomeScreen')}>
           <Image source={require('@/assets/images/back_arrow.png')} style={styles.backIcon} />
         </TouchableOpacity>
         <Text style={styles.headerText}>Community</Text>
       </View>
 
-      {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search"
-          placeholderTextColor="#aaa"
-        />
-      </View>
-
-      {/* Drills List */}
-      <ScrollView contentContainerStyle={styles.drillList}>
-        {/* Drill Item 1 */}
-        <TouchableOpacity style={styles.drillItem}>
-          <Image source={require('../../assets/images/d1.jpg')} style={styles.drillThumbnail} />
-          <View style={styles.drillDetails}>
-            <Text style={styles.drillTitle}>How to bowl Inswing - Brett Lee</Text>
+      {/* Community messages */}
+      <ScrollView style={styles.messageContainer}>
+        {messages.map((msg, index) => (
+          <View key={index} style={styles.messageBox}>
+            <Text style={styles.username}>{msg.username}</Text>
+            <Text style={styles.message}>{msg.message}</Text>
           </View>
-        </TouchableOpacity>
-
-        {/* Drill Item 2 */}
-        <TouchableOpacity style={styles.drillItem}>
-          <Image source={require('../../assets/images/d2.jpg')} style={styles.drillThumbnail} />
-          <View style={styles.drillDetails}>
-            <Text style={styles.drillTitle}>How to inswing tapeball - Arsl</Text>
-          </View>
-        </TouchableOpacity>
-
-        {/* Drill Item 3 */}
-        <TouchableOpacity style={styles.drillItem}>
-          <Image source={require('../../assets/images/d3.jpg')} style={styles.drillThumbnail} />
-          <View style={styles.drillDetails}>
-            <Text style={styles.drillTitle}>How to put reverse swing - cricket tag</Text>
-          </View>
-        </TouchableOpacity>
+        ))}
       </ScrollView>
 
-      {/* Navbar */}
-      <View style={styles.navbar}>
-        <View style={styles.navItem}>
-          <View style={styles.highlight}>
-            <Image
-              source={require('@/assets/images/drills.png')}
-              style={styles.navIcon}
-            />
-          </View>
-        </View>
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/PlayerFitness')}>
-          <Image source={require('@/assets/images/fitness.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/PlayerHomePage')}>
-          <Image source={require('@/assets/images/home.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/PlayerCommunity')}>
-          <Image source={require('@/assets/images/group.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/PlayerHighlightsPage')}>
-          <Image source={require('@/assets/images/cloud.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/PlayerSettings')}>
-          <Image source={require('@/assets/images/settings.png')} style={styles.navIcon} />
+      {/* Message Input Button */}
+      <View style={styles.messageInputContainer}>
+        <TouchableOpacity style={styles.messageButton}>
+          <Image source={require('@/assets/images/message_icon.png')} style={styles.messageIcon} />
+          <Text style={styles.messageButtonText}>Message</Text>
+          <Image source={require('@/assets/images/send.png')} style={styles.sendIcon}/>
         </TouchableOpacity>
       </View>
     </View>
@@ -86,108 +49,78 @@ export default function TeamOwnerCommunity() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#121212', // Dark background for the drills section
+    backgroundColor: '#121212', // Dark background
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingTop: 55,
-    backgroundColor: '#005B41',
+    paddingBottom: 20,
+    
   },
   backIcon: {
     width: 24,
     height: 24,
-    marginLeft:15,
+    marginLeft: 15,
     tintColor: '#fff',
   },
   headerText: {
     flex: 1,
-    fontSize: 30,
-    paddingRight:35,
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#fff',
     textAlign: 'center',
+    marginRight:30,
   },
-  searchContainer: {
-    paddingHorizontal: 15,
-    paddingVertical: 25,
-    backgroundColor: '#005B41',
-  },
-  searchInput: {
-    backgroundColor: '#1e1e1e',
-    borderRadius: 20,
-    height:35,
-    paddingHorizontal: 15,
-    color: '#000',
-  },
-  drillList: {
-    paddingHorizontal: 15,
-    paddingVertical:10
-  },
-  drillItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#1c1c1c',
-    padding: 15,
-    marginVertical: 5,
-    borderRadius: 10,
-  },
-  drillThumbnail: {
-    width: 100,
-    height: 50,
-    borderRadius: 10,
-  },
-  drillDetails: {
+  messageContainer: {
     flex: 1,
-    marginLeft: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
   },
-  drillTitle: {
+  messageBox: {
+    marginBottom: 20,
+    padding: 15,
+    borderRadius: 10,
+    backgroundColor: '#1c1c1c', // Dark message box background
+  },
+  username: {
     fontSize: 16,
-    fontWeight: 'normal',
-    color: '#fff',
+    fontWeight: 'bold',
+    color: '#ffffff',
+    marginBottom: 5,
   },
-  navbar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: '#1e1e1e', // Dark navbar background
-    paddingVertical: 7,
-    borderTopLeftRadius: 50, // Extra rounded top corners for a sleek look
-    borderTopRightRadius: 50,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 15,
-    elevation: 20,
-    paddingHorizontal:20,
+  message: {
+    fontSize: 14,
+    color: '#b0b0b0', // Light grey text color
   },
-  navItem: {
-    alignItems: 'center',
+  messageInputContainer: {
     padding: 10,
+    backgroundColor: '#121212', // Dark background to blend with the main screen
+    borderTopWidth: 1,
+    borderColor: '#333333', // Border for the top
   },
-  navIcon: {
-    width: 25, // Slightly larger icons
-    height: 25,
-    tintColor: '#fff', // Light icon color
-  },
-  highlight: {
-    position: 'absolute',
-    bottom: 30, // Slightly raised pop-up effect
-    backgroundColor: '#005B41', // Teal highlight
-    borderRadius: 50,
-    width: 70,
-    height: 70,
-    justifyContent: 'center',
+  messageButton: {
+    flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#00e676', // Bright shadow effect for the highlight
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.6,
-    shadowRadius: 10,
-    elevation: 10,
-    borderColor: '#1e1e1e',  // Darker border color for contrast
-    borderWidth: 5,
+    backgroundColor: '#444444', // Slightly lighter dark color for the button
+    borderRadius: 30,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  messageIcon: {
+    width: 24,
+    height: 24,
+    marginRight: 10,
+    tintColor: '#fff',
+  },
+  sendIcon:{
+    width: 24,
+    height: 24,
+    marginLeft: 210,
+    tintColor: '#fff',
+  },
+  messageButtonText: {
+    fontSize: 16,
+    color: '#fff',
   },
 });

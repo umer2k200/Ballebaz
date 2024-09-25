@@ -26,6 +26,7 @@ const RootLayout = () => {
             <Stack.Screen name='PlayerUpcomingMatches/index' options={{headerShown:false}} />
             {/* Team Owner */}
             <Stack.Screen name='TeamOwnerBookGround/index' options={{headerShown:false}} />
+            <Stack.Screen name='TeamOwnerBookGround-2/index' options={{headerShown:false}} />
             <Stack.Screen name='TeamOwnerCommunity/index' options={{headerShown:false}} />
             <Stack.Screen name='TeamOwnerGenerateKit/index' options={{headerShown:false}} />
             <Stack.Screen name='TeamOwnerHighlightsPage/index' options={{headerShown:false}} />
@@ -34,7 +35,8 @@ const RootLayout = () => {
             <Stack.Screen name='TeamOwnerTeamsRanking/index' options={{headerShown:false}} />
             <Stack.Screen name='TeamOwnerUpcomingMatches/index' options={{headerShown:false}} />
             <Stack.Screen name='TeamOwnerViewPlayers/index' options={{headerShown:false}} />
-            <Stack.Screen name='TeamOwnerMoreNavbar/index' options={{headerShown:false}} />
+            <Stack.Screen name='TeamOwnerDrills/index' options={{headerShown:false}} />
+            <Stack.Screen name='TeamOwnerSettings/index' options={{headerShown:false}} />
 
             {/* Coach */}
             <Stack.Screen name='CoachHomePage/index' options={{headerShown:false}} />
