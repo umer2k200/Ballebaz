@@ -14,6 +14,7 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    npm i expo-av
    npm i react-native-app-intro-slider
    npm i expo-image-picker
+   npm install @react-native-community/datetimepicker
    ```
 
 2. Start the app

@@ -1,84 +1,127 @@
-import React from 'react';
+import React, { useState } from "react";
 import { useRouter } from "expo-router";
-import { useNavigation } from '@react-navigation/native';
-import { View, Text, StyleSheet, Image, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import { useNavigation } from "@react-navigation/native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  Modal,
+  Alert, // Import Alert
+} from "react-native";
 
-export default function TeamOwnerHireCoach() {
+import Icon from 'react-native-vector-icons/MaterialIcons'; // Import icons
+
+// Define the Player type
+type Player = {
+  name: string;
+  Ratings: string;
+  expertise: string;
+  experience: string;
+};
+
+export default function CoachAssignedPlayers() {
   const router = useRouter();
   const navigation = useNavigation();
 
+  const assignedPlayers: Player[] = [
+    {
+      name: "Gary Kirsten",
+      Ratings: '4.5/5',
+      expertise: 'Power Hitting',
+      experience: '2 Years',
+    },
+    {
+      name: "Yonus Khan",
+      Ratings: '4.2/5',
+      expertise: 'Batting',
+      experience: '1.5 Years',
+    },
+    {
+      name: "Waqar Younis",
+      Ratings: '3.7/5',
+      expertise: 'Fast Bowling',
+      experience: '2 Years',
+    },
+  ];
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+
+  const handlePlayerPress = (player: Player) => {
+    setSelectedPlayer(player);
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+    setSelectedPlayer(null);
+  };
+
+  const handleRequestSubmit = () => {
+    Alert.alert("Request Submitted", "Your request has been successfully submitted.");
+    closeModal();
+  };
+
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Image source={require('@/assets/images/back_arrow.png')} style={styles.backIcon} />
+        <TouchableOpacity onPress={() => router.push('/TeamOwnerHomeScreen')}>
+          <Icon name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
-        <Text style={styles.headerText}>Hire Coach</Text>
+        <Text style={styles.pageName}>Available Coaches</Text>
       </View>
 
-      {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search"
-          placeholderTextColor="#aaa"
-        />
-      </View>
-
-      {/* Drills List */}
-      <ScrollView contentContainerStyle={styles.drillList}>
-        {/* Drill Item 1 */}
-        <TouchableOpacity style={styles.drillItem}>
-          <Image source={require('../../assets/images/d1.jpg')} style={styles.drillThumbnail} />
-          <View style={styles.drillDetails}>
-            <Text style={styles.drillTitle}>How to bowl Inswing - Brett Lee</Text>
-          </View>
-        </TouchableOpacity>
-
-        {/* Drill Item 2 */}
-        <TouchableOpacity style={styles.drillItem}>
-          <Image source={require('../../assets/images/d2.jpg')} style={styles.drillThumbnail} />
-          <View style={styles.drillDetails}>
-            <Text style={styles.drillTitle}>How to inswing tapeball - Arsl</Text>
-          </View>
-        </TouchableOpacity>
-
-        {/* Drill Item 3 */}
-        <TouchableOpacity style={styles.drillItem}>
-          <Image source={require('../../assets/images/d3.jpg')} style={styles.drillThumbnail} />
-          <View style={styles.drillDetails}>
-            <Text style={styles.drillTitle}>How to put reverse swing - cricket tag</Text>
-          </View>
-        </TouchableOpacity>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        {assignedPlayers.map((player, index) => (
+          <TouchableOpacity
+            key={index}
+            style={styles.playerCard}
+            onPress={() => handlePlayerPress(player)}
+          >
+            <View style={styles.playerInfoContainer}>
+              <Image
+                source={require("@/assets/images/assignedplayer.png")}
+                style={styles.playerImage}
+              />
+              <View style={styles.playerDetails}>
+                <Text style={styles.playerName}>{player.name}</Text>
+                <Text style={styles.RatingsDetails}>Ratings: {player.Ratings}</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        ))}
       </ScrollView>
 
-      {/* Navbar */}
-      <View style={styles.navbar}>
-        <View style={styles.navItem}>
-          <View style={styles.highlight}>
-            <Image
-              source={require('@/assets/images/drills.png')}
-              style={styles.navIcon}
-            />
+      {/* Player Details Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={closeModal}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalView}>
+            {selectedPlayer && (
+              <>
+                <Text style={styles.modalTitle}>{selectedPlayer.name}</Text>
+                <Text style={styles.modalDetails}>Ratings: {selectedPlayer.Ratings}</Text>
+                <Text style={styles.modalDetails}>Expertise: {selectedPlayer.expertise}</Text>
+                <Text style={styles.modalDetails}>Experience: {selectedPlayer.experience}</Text>
+
+                <TouchableOpacity
+                  style={styles.closeButton}
+                  onPress={handleRequestSubmit} // Call the alert when button is pressed
+                >
+                  <Text style={styles.closeButtonText}>Request</Text>
+                </TouchableOpacity>
+              </>
+            )}
           </View>
         </View>
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/PlayerFitness')}>
-          <Image source={require('@/assets/images/fitness.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/PlayerHomePage')}>
-          <Image source={require('@/assets/images/home.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/PlayerCommunity')}>
-          <Image source={require('@/assets/images/group.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/PlayerHighlightsPage')}>
-          <Image source={require('@/assets/images/cloud.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/PlayerSettings')}>
-          <Image source={require('@/assets/images/settings.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-      </View>
+      </Modal>
     </View>
   );
 }
@@ -86,108 +129,96 @@ export default function TeamOwnerHireCoach() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#121212', // Dark background for the drills section
+    backgroundColor: "#121212",
+    paddingHorizontal: 20,
+    paddingBottom: 100,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: 55,
-    backgroundColor: '#005B41',
+    justifyContent: 'space-between',
+    marginTop: 50,
+    marginBottom: 50,
   },
-  backIcon: {
-    width: 24,
-    height: 24,
-    marginLeft:15,
-    tintColor: '#fff',
-  },
-  headerText: {
-    flex: 1,
-    fontSize: 30,
-    paddingRight:35,
+  pageName: {
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#fff',
+    color: 'white',
     textAlign: 'center',
-  },
-  searchContainer: {
-    paddingHorizontal: 15,
-    paddingVertical: 25,
-    backgroundColor: '#005B41',
-  },
-  searchInput: {
-    backgroundColor: '#1e1e1e',
-    borderRadius: 20,
-    height:35,
-    paddingHorizontal: 15,
-    color: '#000',
-  },
-  drillList: {
-    paddingHorizontal: 15,
-    paddingVertical:10
-  },
-  drillItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#1c1c1c',
-    padding: 15,
-    marginVertical: 5,
-    borderRadius: 10,
-  },
-  drillThumbnail: {
-    width: 100,
-    height: 50,
-    borderRadius: 10,
-  },
-  drillDetails: {
     flex: 1,
-    marginLeft: 20,
   },
-  drillTitle: {
-    fontSize: 16,
-    fontWeight: 'normal',
-    color: '#fff',
+  scrollContainer: {
+    alignItems: "center",
+    paddingBottom: 100,
   },
-  navbar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: '#1e1e1e', // Dark navbar background
-    paddingVertical: 7,
-    borderTopLeftRadius: 50, // Extra rounded top corners for a sleek look
-    borderTopRightRadius: 50,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 15,
-    elevation: 20,
-    paddingHorizontal:20,
-  },
-  navItem: {
-    alignItems: 'center',
+  playerCard: {
+    backgroundColor: "#005B41",
+    borderRadius: 20,
+    marginBottom: 25,
     padding: 10,
+    width: "95%",
+    alignSelf: "center",
   },
-  navIcon: {
-    width: 25, // Slightly larger icons
-    height: 25,
-    tintColor: '#fff', // Light icon color
+  playerInfoContainer: {
+    flexDirection: "row",
+    alignItems: "center",
   },
-  highlight: {
-    position: 'absolute',
-    bottom: 30, // Slightly raised pop-up effect
-    backgroundColor: '#005B41', // Teal highlight
-    borderRadius: 50,
-    width: 70,
-    height: 70,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#00e676', // Bright shadow effect for the highlight
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.6,
-    shadowRadius: 10,
-    elevation: 10,
-    borderColor: '#1e1e1e',  // Darker border color for contrast
-    borderWidth: 5,
+  playerImage: {
+    width: 80,
+    height: 80,
+    marginRight: 10,
+  },
+  playerDetails: {
+    flex: 1,
+  },
+  playerName: {
+    color: "#fff",
+    fontSize: 18,
+  },
+  RatingsDetails: {
+    color: "#ccc",
+    fontSize: 12,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
+  },
+  modalView: {
+    width: "90%",
+    backgroundColor: "#1e1e1e",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 24,
+    color: "#fff",
+    marginBottom: 15,
+  },
+  modalDetails: {
+    color: "#aaa",
+    fontSize: 16,
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  closeButton: {
+    backgroundColor: "#005B41",
+    borderRadius: 10,
+    padding: 10,
+    width: 100,
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 2,
+  },
+  closeButtonText: {
+    color: "#fff",
+    fontSize: 16,
   },
 });
