@@ -65,7 +65,7 @@ export default function Onboarding() {
         renderSkipButton={() => buttonLabel("Skip")}
         renderDoneButton={() => buttonLabel("Done")}
         onDone={() => {
-          router.push('/UmpireHome');
+          router.push('/Login');
         }}
       />
     );
