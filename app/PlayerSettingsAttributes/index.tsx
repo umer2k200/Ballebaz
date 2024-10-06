@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native'; // Import useNavigation for navigation
-import { Dimensions } from 'react-native'; // To make the screen responsive
 import { useRouter } from 'expo-router';
 
 export default function PlayerAttributesScreen() {
@@ -11,8 +10,6 @@ export default function PlayerAttributesScreen() {
   const [age, setAge] = useState('');
   const [weight, setWeight] = useState('');
   const [heightFeet, setHeightFeet] = useState('');
-  const [heightInches, setHeightInches] = useState('');
-  const screenWidth = Dimensions.get('window').width;
 
   const navigation = useNavigation(); // Hook to handle back navigation
   const router = useRouter();
@@ -103,27 +100,19 @@ export default function PlayerAttributesScreen() {
           <Text style={styles.unit}>kg</Text>
         </View>
 
+
+
         {/* Height Input */}
         <View style={styles.inputRow}>
           <TextInput
             style={styles.input}
-            placeholder="ft"
+            placeholder="Height"
             keyboardType="numeric"
             value={heightFeet}
             onChangeText={setHeightFeet}
             placeholderTextColor="#999"
           />
           <Text style={styles.unit}>ft</Text>
-
-          <TextInput
-            style={styles.input}
-            placeholder="in"
-            keyboardType="numeric"
-            value={heightInches}
-            onChangeText={setHeightInches}
-            placeholderTextColor="#999"
-          />
-          <Text style={styles.unit}>in</Text>
         </View>
       </View>
 

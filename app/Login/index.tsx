@@ -1,4 +1,5 @@
-import { Link, useRouter } from "expo-router";
+import { useState } from "react";
+import { useRouter } from "expo-router";
 import {
   StyleSheet,
   View,
@@ -6,11 +7,75 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  Alert,
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
+import RNPickerSelect from "react-native-picker-select";
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { db } from '@/firebaseConfig';
+import { collection, query, where, getDocs } from "firebase/firestore";
 
 export default function Login() {
   const router = useRouter();
+
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("");
+
+
+  const handleLogin = async () => {
+    if (!username || !password || !role) {
+      Alert.alert("Error", "Please fill all fields");
+      return;
+    }
+
+    try {
+      let collectionName = "";
+
+      switch (role) {
+        case "player":
+          collectionName = "player";
+          break;
+        case "coach":
+          collectionName = "coach";
+          break;
+        case "umpire":
+          collectionName = "umpire";
+          break;
+        case "club_owner":
+          collectionName = "clubOwner";
+          break;
+        default:
+          Alert.alert("Error", "Invalid role selected");
+          return;
+      }
+
+      const userQuery = query(
+        collection(db, collectionName),
+        where("username", "==", username),
+        where("password", "==", password)
+      );
+
+      const querySnapshot = await getDocs(userQuery);
+
+      if (!querySnapshot.empty) {
+
+        const userData = querySnapshot.docs[0].data();
+        console.log("UserData: ", userData);
+        await AsyncStorage.setItem("userData", JSON.stringify(userData));
+        
+        Alert.alert("Success", "Login successful!, welcome " + username);
+        router.push("/PlayerHomePage"); 
+      } else {
+        
+        Alert.alert("Error", "Invalid username or password");
+      }
+    } catch (error) {
+      console.error("Error logging in: ", error);
+      Alert.alert("Error", "Login failed");
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Image
@@ -18,12 +83,15 @@ export default function Login() {
         style={styles.logo}
       />
       <Text style={styles.title}>SIGN IN</Text>
+
       <View style={styles.inputContainer}>
         <Icon name="user" size={20} color="grey" />
         <TextInput
           placeholder="Username"
           placeholderTextColor="grey" // Contrast color
           style={styles.input}
+          value={username}
+          onChangeText={setUsername}
         />
       </View>
       <View style={styles.inputContainer}>
@@ -33,11 +101,30 @@ export default function Login() {
           secureTextEntry
           placeholderTextColor="grey" // Contrast color
           style={styles.input}
+          value={password}
+          onChangeText={setPassword}
         />
       </View>
+
+      <View style={styles.inputContainer}>
+        <Icon name="user" size={20} color="grey" style={{ paddingBottom: 5 }} />
+        <RNPickerSelect
+          onValueChange={setRole}
+          items={[
+            { label: "Player", value: "player" },
+            { label: "Coach", value: "coach" },
+            { label: "Umpire", value: "umpire" },
+            { label: "Club Owner", value: "club_owner" },
+          ]}
+          style={pickerSelectStyles}
+          placeholder={{ label: "Select Role", value: null }}
+        />
+      </View>
+
+      
       <TouchableOpacity
         style={styles.button}
-        onPress={() => router.push("/UmpireScoring")}
+        onPress={handleLogin}
       >
         <Text style={styles.buttonText}>Sign in</Text>
       </TouchableOpacity>
@@ -93,6 +180,7 @@ const styles = StyleSheet.create({
     marginBottom: 25,
     marginHorizontal: 25,
     paddingHorizontal: 10,
+    width: "85%",
   },
   input: {
     flex: 1,
@@ -141,5 +229,28 @@ const styles = StyleSheet.create({
   },
   signupButton: {
     color: "#005B41",
+  },
+});
+const pickerSelectStyles = StyleSheet.create({
+  inputIOS: {
+    flex: 1,
+    fontSize: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    color: "black",
+    width: "100%", // Make the picker span the width of the container
+    textAlign: "left", // Align text to the left
+    paddingRight: 30, // To ensure the text is never behind the icon
+  },
+  inputAndroid: {
+    flex: 1,
+    
+    fontSize: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    color: "black",
+    width: "100%", // Make the picker span the width of the container
+    textAlign: "left", // Align text to the left
+    paddingRight: 30, // To ensure the text is never behind the icon
   },
 });
