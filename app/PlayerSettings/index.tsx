@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { doc, updateDoc, getDoc } from "firebase/firestore";
+import { doc, updateDoc, getDocs, query, where, collection } from "firebase/firestore";
 import { db } from "@/firebaseConfig";
 
 export default function PlayerSettingsScreen() {
@@ -20,6 +20,52 @@ export default function PlayerSettingsScreen() {
   const [password, setPassword] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const router = useRouter();
+
+  const [userData, setUserData] = useState({
+    name: "",
+    username: "",
+    phone_no: 0,
+    role: "",
+    password: "",
+    player_id: "",
+    strike_rate: 0,
+    fitness_status: "",
+    matches_played: 0,
+    best_bowling: "",
+    economy: 0,
+    highlights: [],
+    team_id: "",
+    preferred_hand: "",
+    bowling_hand: "",
+    average: 0,
+    training_sessions: [],
+    assigned_drills: "",
+    wickets_taken: 0,
+    weight: 0,
+    height: 0,
+    age: 0,
+    email: "",
+    fiveWickets: 0,
+  });
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const storedUserData = await AsyncStorage.getItem("userData");
+        if (storedUserData) {
+          const parsedUserData = JSON.parse(storedUserData);
+          console.log("Fetched User Data:", parsedUserData); // Debugging
+          setUserData(parsedUserData);
+        }
+      } catch (error) {
+        console.log("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+    
 
   const handleLogout = async () => {
     try {
@@ -32,8 +78,62 @@ export default function PlayerSettingsScreen() {
   };
 
   const handleUpdate = async () => {
-    
+    try {
+      // Get the current user data from AsyncStorage
+      const storedUserData = await AsyncStorage.getItem("userData");
+      
+      if (storedUserData) {
+        const parsedUserData = JSON.parse(storedUserData);
+  
+        // Assuming player_id is unique and exists in the user data
+        const userPlayerId = parsedUserData.player_id;
+  
+        // Create a reference to the "player" collection
+        const playerCollectionRef = collection(db, "player");
+  
+        // Query Firestore for the document with this player_id
+        const q = query(playerCollectionRef, where("player_id", "==", userPlayerId));
+        const querySnapshot = await getDocs(q);
+  
+        if (!querySnapshot.empty) {
+          // Assuming there's only one matching document
+          const userDoc = querySnapshot.docs[0];
+          const userDocId = userDoc.id; // Get the document ID dynamically
+  
+          // Create the reference to the Firestore document using the fetched userDocId
+          const userDocRef = doc(db, "player", userDocId);
+  
+          // Update Firestore with the new data (username, phoneNumber, password)
+          await updateDoc(userDocRef, {
+            username: username || parsedUserData.username,
+            phone_no: phoneNumber || parsedUserData.phone_no,
+            password: password || parsedUserData.password,
+          });
+  
+          // Update the local user data in AsyncStorage
+          const updatedUserData = {
+            ...parsedUserData,
+            username: username || parsedUserData.username,
+            phone_no: phoneNumber || parsedUserData.phone_no,
+            password: password || parsedUserData.password,
+          };
+  
+          await AsyncStorage.setItem("userData", JSON.stringify(updatedUserData));
+  
+          Alert.alert("Success", "Profile updated successfully!");
+        } else {
+          Alert.alert("Error", "User document not found in Firestore.");
+        }
+      } else {
+        Alert.alert("Error", "User data not found.");
+      }
+    } catch (error) {
+      console.error("Error updating user data: ", error);
+      Alert.alert("Error", "Update failed.");
+    }
   };
+  
+  
 
   return (
     <View style={styles.container}>
@@ -46,7 +146,7 @@ export default function PlayerSettingsScreen() {
           style={styles.input}
           value={username}
           onChangeText={setUsername}
-          placeholder={username}
+          placeholder={userData.username}
           placeholderTextColor="#999"
         />
       </View>
@@ -58,7 +158,7 @@ export default function PlayerSettingsScreen() {
           style={styles.input}
           value={phoneNumber}
           onChangeText={setPhoneNumber}
-          placeholder={phoneNumber}
+          placeholder={userData.phone_no.toString()}
           keyboardType="phone-pad"
           placeholderTextColor="#999"
         />

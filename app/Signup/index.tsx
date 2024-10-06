@@ -52,6 +52,7 @@ export default function Signup() {
         highlights: [],
         team_id: "",
         preferred_hand: "",
+        bowling_hand: "",
         average: 0,
         training_sessions: [],
         assigned_drills: "",

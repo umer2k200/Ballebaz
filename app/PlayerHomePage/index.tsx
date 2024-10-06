@@ -28,6 +28,7 @@ export default function ProfileScreen() {
     highlights: [],
     team_id: "",
     preferred_hand: "",
+    bowling_hand: "",
     average: 0,
     training_sessions: [],
     assigned_drills: "",
@@ -206,7 +207,7 @@ const styles = StyleSheet.create({
   scrollContainer: {
     alignItems: "center",
     paddingHorizontal: 20,
-    paddingBottom: 100, // Add extra padding to avoid content being hidden behind the navbar
+    paddingBottom: 20, // Add extra padding to avoid content being hidden behind the navbar
   },
   profilePicContainer: {
     borderRadius: 75,
