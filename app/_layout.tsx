@@ -14,7 +14,7 @@ const RootLayout = () => {
             <Stack.Screen name='index' options={{headerShown: false}} />
             <Stack.Screen name='Onboarding/index' options={{headerShown: false}} />
             <Stack.Screen name='Login/index' options={{headerShown: false}} />
-            <Stack.Screen name='Signup/index' options={{title: 'Back to login'}} />
+            <Stack.Screen name='Signup/index' options={{headerShown: false}} />
             {/* Player */}
             <Stack.Screen name='PlayerHomePage/index' options={{headerShown:false}} />
             <Stack.Screen name='PlayerDrills/index' options={{headerShown:false}} />
@@ -56,8 +56,8 @@ const RootLayout = () => {
             <Stack.Screen name='UmpireHome/index' options={{headerShown:false}} />
             <Stack.Screen name='UmpireSettings/index' options={{headerShown:false}} />
             <Stack.Screen name='UmpireUpcomingMatches/index' options={{headerShown:false}} />
-
             <Stack.Screen name='MatchDetails/index' options={{headerShown:false}} />
+            <Stack.Screen name='UmpireScoring/index' options={{headerShown:false}} />
         </Stack>
     )
 }

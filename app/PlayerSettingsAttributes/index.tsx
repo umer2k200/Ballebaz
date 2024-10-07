@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native'; // Import useNavigation for navigation
-import { Dimensions } from 'react-native'; // To make the screen responsive
+import React, { useState , useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image, Alert, ActivityIndicator, } from 'react-native';
 import { useRouter } from 'expo-router';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {db } from '@/firebaseConfig';
+import { doc, updateDoc, getDocs, query, where, collection } from 'firebase/firestore';
+import CustomAlert from '@/components/CustomAlert';
 
 export default function PlayerAttributesScreen() {
   const [role, setRole] = useState('');
@@ -11,17 +13,143 @@ export default function PlayerAttributesScreen() {
   const [age, setAge] = useState('');
   const [weight, setWeight] = useState('');
   const [heightFeet, setHeightFeet] = useState('');
-  const [heightInches, setHeightInches] = useState('');
-  const screenWidth = Dimensions.get('window').width;
-
-  const navigation = useNavigation(); // Hook to handle back navigation
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+
+  const [userData, setUserData] = useState({
+    name: "",
+    username: "",
+    phone_no: 0,
+    role: "",
+    password: "",
+    player_id: "",
+    strike_rate: 0,
+    fitness_status: "",
+    matches_played: 0,
+    best_bowling: "",
+    economy: 0,
+    highlights: [],
+    team_id: "",
+    preferred_hand: "",
+    bowling_hand: "",
+    average: 0,
+    training_sessions: [],
+    assigned_drills: "",
+    wickets_taken: 0,
+    weight: 0,
+    height: 0,
+    age: 0,
+    email: "",
+    fiveWickets: 0,
+  });
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const storedUserData = await AsyncStorage.getItem("userData");
+        if (storedUserData) {
+          const parsedUserData = JSON.parse(storedUserData);
+          console.log("Fetched User Data:", parsedUserData); // Debugging
+          setUserData(parsedUserData);
+
+          // Set state based on the fetched user data
+          setRole(parsedUserData.role || '');
+          setBattingHand(parsedUserData.preferred_hand === 'Right' || parsedUserData.preferred_hand === 'Left' ? parsedUserData.preferred_hand.split(' ')[0] : '');
+          setBowlingHand(parsedUserData.bowling_hand === 'Right' || parsedUserData.bowling_hand === 'Left' ? parsedUserData.bowling_hand.split(' ')[0] : '');
+          setAge(parsedUserData.age.toString() || '');
+          setWeight(parsedUserData.weight.toString() || '');
+          setHeightFeet(parsedUserData.height.toString() || '');
+        }
+      } catch (error) {
+        console.log("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  const handleSaveAttributes = async () => {
+    setLoading(true);
+    try {
+      
+      const storedUserData = await AsyncStorage.getItem("userData");
+      if (storedUserData) {
+        const parsedUserData = JSON.parse(storedUserData);
+        const userPlayerId = parsedUserData.player_id;
+
+        const playerCollectionRef = collection(db, "player");
+        const q = query(playerCollectionRef, where("player_id", "==", userPlayerId));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+          const userDoc = querySnapshot.docs[0];
+          const userDocId = userDoc.id;
+          const userDocRef = doc(db, "player", userDocId);
+
+          const preferredHand = `${battingHand}`;
+          const bowlinghand = `${bowlingHand}`;
+          await updateDoc(userDocRef, {
+            role: role || parsedUserData.role,
+            preferred_hand: preferredHand || parsedUserData.preferred_hand,
+            bowling_hand: bowlinghand || parsedUserData.bowling_hand,
+            age: parseInt(age) || parsedUserData.age,
+            weight: parseFloat(weight) || parsedUserData.weight,
+            height: parseFloat(heightFeet) || parsedUserData.height,
+          });
+
+          const updatedUserData = {
+            ...parsedUserData,
+            role: role || parsedUserData.role,
+            preferred_hand: preferredHand || parsedUserData.preferred_hand,
+            bowling_hand: bowlinghand || parsedUserData.bowling_hand,
+            age: parseInt(age) || parsedUserData.age,
+            weight: parseFloat(weight) || parsedUserData.weight,
+            height: parseFloat(heightFeet) || parsedUserData.height,
+          };
+
+          await AsyncStorage.setItem("userData", JSON.stringify(updatedUserData));
+
+          
+          setAlertMessage("Attributes updated successfully!");
+          setAlertVisible(true);
+        } else {
+          setAlertMessage("User document not found in Firestore.");
+          setAlertVisible(true);
+          
+        }
+      } else {
+        
+        setAlertMessage("User data not found.");
+        setAlertVisible(true);
+      }
+    } catch (error) {
+      console.error("Error updating user data: ", error);
+      setAlertMessage("Update failed");
+      setAlertVisible(true);
+    }finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAlertConfirm = () => {
+    setAlertVisible(false);
+  };
+
 
   return (
     <>
+    {loading ? (
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator size='large' color='#005B41' />
+      </View>
+      ) : (
+        <>
     <ScrollView style={styles.container}>
+      
       {/* Back Button */}
-      <TouchableOpacity style={styles.backButton} onPress={() => router.push('/PlayerSettings')}>
+      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
         <Image source={require('@/assets/images/back.png')} style={styles.navIcon} />
       </TouchableOpacity>
 
@@ -31,7 +159,7 @@ export default function PlayerAttributesScreen() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Role</Text>
         <View style={styles.buttonContainer}>
-          {['Batter', 'Bowler', 'Batting Allrounder', 'Bowling Allrounder', 'Wicket Keeper Batter'].map((item) => (
+          {['Batsman', 'Bowler', 'Batting Allrounder', 'Bowling Allrounder', 'Wicket Keeper Batter'].map((item) => (
             <TouchableOpacity
               key={item}
               style={[styles.button, role === item && styles.selectedButton]}
@@ -48,7 +176,7 @@ export default function PlayerAttributesScreen() {
         <Text style={styles.sectionTitle}>Preferred Hand</Text>
         <View style={styles.buttonContainer}>
           <Text style={styles.handLabel}>Batting Hand:</Text>
-          {['Right', 'Left'].map((hand) => (
+          {[ 'Left', 'Right'].map((hand) => (
             <TouchableOpacity
               key={hand}
               style={[styles.button, battingHand === hand && styles.selectedButton]}
@@ -61,7 +189,7 @@ export default function PlayerAttributesScreen() {
 
         <View style={styles.buttonContainer}>
           <Text style={styles.handLabel}>Bowling Hand:</Text>
-          {['Right', 'Left'].map((hand) => (
+          {[ 'Left','Right'].map((hand) => (
             <TouchableOpacity
               key={hand}
               style={[styles.button, bowlingHand === hand && styles.selectedButton]}
@@ -103,35 +231,36 @@ export default function PlayerAttributesScreen() {
           <Text style={styles.unit}>kg</Text>
         </View>
 
+
+
         {/* Height Input */}
         <View style={styles.inputRow}>
           <TextInput
             style={styles.input}
-            placeholder="ft"
+            placeholder="Height"
             keyboardType="numeric"
             value={heightFeet}
             onChangeText={setHeightFeet}
             placeholderTextColor="#999"
           />
           <Text style={styles.unit}>ft</Text>
-
-          <TextInput
-            style={styles.input}
-            placeholder="in"
-            keyboardType="numeric"
-            value={heightInches}
-            onChangeText={setHeightInches}
-            placeholderTextColor="#999"
-          />
-          <Text style={styles.unit}>in</Text>
         </View>
       </View>
 
       {/* Save Button */}
-      <TouchableOpacity style={styles.saveButton}>
+      <TouchableOpacity style={styles.saveButton} onPress={handleSaveAttributes}>
         <Text style={styles.saveButtonText}>Save Attributes</Text>
       </TouchableOpacity>
+      
     </ScrollView>
+    </>
+  )}
+  <CustomAlert 
+    visible={alertVisible} 
+    message={alertMessage} 
+    onConfirm={handleAlertConfirm} 
+    onCancel={handleAlertConfirm}
+  />
     </>
   );
 }
@@ -142,6 +271,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#121212', // Dark background color
     paddingHorizontal: 20,
     paddingTop: 30,
+  },
+  loaderContainer: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#1e1e1e', // Semi-transparent background
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex:1000,
   },
   title: {
     fontSize: 28,
