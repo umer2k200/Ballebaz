@@ -1,16 +1,7 @@
 import React, { useState } from "react";
 import { useRouter } from "expo-router";
 import { useNavigation } from "@react-navigation/native";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-  Modal,
-  Alert, // Import Alert
-} from "react-native";
+import { View,Text, StyleSheet, Image, ScrollView, TouchableOpacity, Modal, Alert,} from "react-native";
 
 import Icon from 'react-native-vector-icons/MaterialIcons'; // Import icons
 
@@ -222,3 +213,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
+
