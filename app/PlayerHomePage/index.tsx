@@ -10,7 +10,6 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
-import { Dimensions } from "react-native"; // To use screen width for responsiveness
 
 export default function ProfileScreen() {
   const [userData, setUserData] = useState({

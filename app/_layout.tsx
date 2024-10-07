@@ -14,7 +14,7 @@ const RootLayout = () => {
             <Stack.Screen name='index' options={{headerShown: false}} />
             <Stack.Screen name='Onboarding/index' options={{headerShown: false}} />
             <Stack.Screen name='Login/index' options={{headerShown: false}} />
-            <Stack.Screen name='Signup/index' options={{title: 'Back to login'}} />
+            <Stack.Screen name='Signup/index' options={{headerShown: false}} />
             {/* Player */}
             <Stack.Screen name='PlayerHomePage/index' options={{headerShown:false}} />
             <Stack.Screen name='PlayerDrills/index' options={{headerShown:false}} />

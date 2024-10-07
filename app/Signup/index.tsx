@@ -8,37 +8,46 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import RNPickerSelect from "react-native-picker-select";
 import { db } from "@/firebaseConfig"; // Import Firebase configuration
 import { collection, addDoc } from "firebase/firestore"; // Firestore methods
-
+import CustomAlert from "@/components/CustomAlert";
 export default function Signup() {
   const router = useRouter();
 
   // Define state variables for form inputs
   const [username, setUsername] = useState("");
+  const [fullName, setfullName] = useState("");
   const [phone, setPhone] = useState("");
   const [role, setRole] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
 
   // Function to handle the signup process
   const handleSignup = async () => {
     if (password.length < 8){
-      Alert.alert("Error", "Password must be at least 8 characters");
+      setAlertMessage("Password must be at least 8 characters");
+      setAlertVisible(true);
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert("Error", "Passwords do not match");
+      setAlertMessage("Passwords do not match");
+      setAlertVisible(true);
       return;
     }
 
+    setLoading(true);
+
     if (role === "player") {
       const playerData = {
-        name: username,
+        name: fullName,
         username: username,
         phone_no: phone,
         role: "",
@@ -68,12 +77,17 @@ export default function Signup() {
         const docRef = await addDoc(collection(db, "player"), playerData);
         console.log("Document written with ID: ", docRef.id);
         
-        Alert.alert("Success", "Account created successfully!");
+        setAlertMessage("Account created successfully!");
+      setAlertVisible(true);
         router.push("/Login"); // Redirect to login after signup
       } catch (error) {
         console.error("Error adding document: ", error);
-        Alert.alert("Error", "Failed to create account");
+        setAlertMessage("Failed to create account");
+      setAlertVisible(true);
+      }finally {
+        setLoading(false);
       }
+
       return;
     }
 
@@ -93,11 +107,16 @@ export default function Signup() {
         const docRef = await addDoc(collection(db, "coach"), coachData);
         console.log("Document written with ID: ", docRef.id);
         
-        Alert.alert("Success", "Account created successfully!");
+        setAlertMessage("Account created successfully");
+      setAlertVisible(true);
         router.push("/Login"); // Redirect to login after signup
       } catch (error) {
         console.error("Error adding document: ", error);
-        Alert.alert("Error", "Failed to create account");
+        
+        setAlertMessage("Failed to create acocunt");
+      setAlertVisible(true);
+      }finally {
+        setLoading(false);
       }
       return;
     }
@@ -116,11 +135,15 @@ export default function Signup() {
         const docRef = await addDoc(collection(db, "umpire"), umpireData);
         console.log("Document written with ID: ", docRef.id);
         
-        Alert.alert("Success", "Account created successfully!");
+        setAlertMessage("Account created successfully");
+        setAlertVisible(true);
         router.push("/Login"); // Redirect to login after signup
       } catch (error) {
         console.error("Error adding document: ", error);
-        Alert.alert("Error", "Failed to create account");
+        setAlertMessage("Failed to create acocunt");
+      setAlertVisible(true);
+      }finally {
+        setLoading(false);
       }
       return;
     }
@@ -141,28 +164,44 @@ export default function Signup() {
         const docRef = await addDoc(collection(db, "clubOwner"), clubOwnerData);
         console.log("Document written with ID: ", docRef.id);
         
-        Alert.alert("Success", "Account created successfully!");
+        setAlertMessage("Account created successfully");
+        setAlertVisible(true);
         router.push("/Login"); // Redirect to login after signup
       } catch (error) {
         console.error("Error adding document: ", error);
-        Alert.alert("Error", "Failed to create account");
+        setAlertMessage("Failed to create acocunt");
+        setAlertVisible(true);
+      }finally {
+        setLoading(false);
       }
       return;
     }
+  };
 
-    
-    
-
-    
+  const handleAlertConfirm = () => {
+    setAlertVisible(false);
   };
 
   return (
     <View style={styles.container}>
-      <Image
-        source={require("@/assets/images/logo.png")} // Make sure to add your logo image in assets
-        style={styles.logo}
-      />
+      { loading ? (
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator size='large' color='#005B41' />
+      </View>
+      ) : (
+        <>
       <Text style={styles.title}>SIGN UP</Text>
+
+      <View style={styles.inputContainer}>
+        <Icon name="user" size={20} color="grey" />
+        <TextInput
+          placeholder="Full Name"
+          placeholderTextColor={"grey"} // Contrast color
+          style={styles.input}
+          value={fullName}
+          onChangeText={setfullName}
+        />
+      </View>
 
       {/* Username Input */}
       <View style={styles.inputContainer}>
@@ -250,6 +289,14 @@ export default function Signup() {
           <Text style={styles.signupButton}>Sign in</Text>
         </TouchableOpacity>
       </View>
+      </>
+      )}
+      <CustomAlert 
+        visible={alertVisible} 
+        message={alertMessage} 
+        onConfirm={handleAlertConfirm} 
+        onCancel={handleAlertConfirm}
+      />
     </View>
   );
 }
@@ -260,6 +307,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#121212",
     alignItems: "center",
     justifyContent: "center",
+  },
+  loaderContainer: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Semi-transparent background
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex:1000,
   },
   logo: {
     width: 200,
@@ -272,10 +326,10 @@ const styles = StyleSheet.create({
     marginRight: 10, // Adds space between the icon and text
   },
   title: {
-    fontSize: 24,
+    fontSize: 34,
     color: "darkgrey",
     fontWeight: "bold",
-    marginBottom: 30,
+    marginBottom:110,
   },
   inputContainer: {
     flexDirection: "row",
@@ -295,10 +349,11 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: "#005B41",
     padding: 10,
+    marginTop:30,
     borderRadius: 50,
     width: "60%",
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 25,
   },
   buttonText: {
     color: "white",

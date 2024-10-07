@@ -1,9 +1,10 @@
 import React, { useState , useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image, Alert, ActivityIndicator, } from 'react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {db } from '@/firebaseConfig';
 import { doc, updateDoc, getDocs, query, where, collection } from 'firebase/firestore';
+import CustomAlert from '@/components/CustomAlert';
 
 export default function PlayerAttributesScreen() {
   const [role, setRole] = useState('');
@@ -13,6 +14,9 @@ export default function PlayerAttributesScreen() {
   const [weight, setWeight] = useState('');
   const [heightFeet, setHeightFeet] = useState('');
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
 
   const [userData, setUserData] = useState({
     name: "",
@@ -67,7 +71,9 @@ export default function PlayerAttributesScreen() {
   }, []);
 
   const handleSaveAttributes = async () => {
+    setLoading(true);
     try {
+      
       const storedUserData = await AsyncStorage.getItem("userData");
       if (storedUserData) {
         const parsedUserData = JSON.parse(storedUserData);
@@ -105,24 +111,45 @@ export default function PlayerAttributesScreen() {
 
           await AsyncStorage.setItem("userData", JSON.stringify(updatedUserData));
 
-          Alert.alert("Success", "Attributes updated successfully!");
+          
+          setAlertMessage("Attributes updated successfully!");
+          setAlertVisible(true);
         } else {
-          Alert.alert("Error", "User document not found in Firestore.");
+          setAlertMessage("User document not found in Firestore.");
+          setAlertVisible(true);
+          
         }
       } else {
-        Alert.alert("Error", "User data not found.");
+        
+        setAlertMessage("User data not found.");
+        setAlertVisible(true);
       }
     } catch (error) {
       console.error("Error updating user data: ", error);
-      Alert.alert("Error", "Update failed.");
+      setAlertMessage("Update failed");
+      setAlertVisible(true);
+    }finally {
+      setLoading(false);
     }
   };
 
+  const handleAlertConfirm = () => {
+    setAlertVisible(false);
+  };
+
+
   return (
     <>
+    {loading ? (
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator size='large' color='#005B41' />
+      </View>
+      ) : (
+        <>
     <ScrollView style={styles.container}>
+      
       {/* Back Button */}
-      <TouchableOpacity style={styles.backButton} onPress={() => router.push('/PlayerSettings')}>
+      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
         <Image source={require('@/assets/images/back.png')} style={styles.navIcon} />
       </TouchableOpacity>
 
@@ -224,7 +251,16 @@ export default function PlayerAttributesScreen() {
       <TouchableOpacity style={styles.saveButton} onPress={handleSaveAttributes}>
         <Text style={styles.saveButtonText}>Save Attributes</Text>
       </TouchableOpacity>
+      
     </ScrollView>
+    </>
+  )}
+  <CustomAlert 
+    visible={alertVisible} 
+    message={alertMessage} 
+    onConfirm={handleAlertConfirm} 
+    onCancel={handleAlertConfirm}
+  />
     </>
   );
 }
@@ -235,6 +271,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#121212', // Dark background color
     paddingHorizontal: 20,
     paddingTop: 30,
+  },
+  loaderContainer: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#1e1e1e', // Semi-transparent background
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex:1000,
   },
   title: {
     fontSize: 28,

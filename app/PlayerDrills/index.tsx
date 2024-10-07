@@ -1,14 +1,111 @@
-import React, {useState} from 'react';
+import React, { useState , useEffect} from 'react';
 import { useRouter } from "expo-router";
 import { useNavigation } from '@react-navigation/native';
-import { View, Text, StyleSheet, Image, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, TextInput, TouchableOpacity, Linking } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+
+const API_KEY = 'AIzaSyD8_5HhOGBOYBKkWMHVm_mSJgUFozq03KU';
+interface VideoItem {
+  id: {
+    videoId: string;
+  };
+  snippet: {
+    title: string;
+    thumbnails: {
+      default: {
+        url: string;
+      };
+    };
+  };
+}
 
 export default function DrillsScreen() {
+  const [userData, setUserData] = useState({
+    name: "",
+    username: "",
+    phone_no: 0,
+    role: "",
+    password: "",
+    player_id: "",
+    strike_rate: 0,
+    fitness_status: "",
+    matches_played: 0,
+    best_bowling: "",
+    economy: 0,
+    highlights: [],
+    team_id: "",
+    preferred_hand: "",
+    bowling_hand: "",
+    average: 0,
+    training_sessions: [],
+    assigned_drills: "",
+    wickets_taken: 0,
+    weight: 0,
+    height: 0,
+    age: 0,
+    email: "",
+    fiveWickets: 0,
+  });
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const storedUserData = await AsyncStorage.getItem("userData");
+        if (storedUserData) {
+          const parsedUserData = JSON.parse(storedUserData);
+          console.log("Fetched User Data in drills:", parsedUserData); // Debugging
+          setUserData(parsedUserData);
+        }
+      } catch (error) {
+        console.log("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  const [query, setQuery] = useState<string>('');
+  const [videos, setVideos] = useState<VideoItem[]>([]);
+  const [popupVisible, setPopupVisible] = useState<boolean>(true);
   const router = useRouter();
   const navigation = useNavigation();
 
+  const searchVideos = async () => {
+    try {
+      // Define default keywords related to cricket drills
+      const drillKeywords = "drills coaching tutorials";
+      // Combine the user input query with drill keywords
+      const cricketDrillQuery = `${query} cricket drills ${drillKeywords}`; 
+  
+      // Fetch YouTube data with the combined query
+      const response = await axios.get(
+        `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${cricketDrillQuery}&type=video&maxResults=10&key=${API_KEY}`
+      );
+      setVideos(response.data.items);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const openVideo = (videoId: string) => {
+    const youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
+    Linking.openURL(youtubeUrl);
+  };
+
   return (
     <View style={styles.container}>
+      {/* Popup Message */}
+      {popupVisible && (
+        <View style={styles.popup}>
+          <Text style={styles.popupText}>Your coach has assigned you:</Text>
+          <Text style={styles.popupText}>{userData.assigned_drills} drills</Text>
+          <TouchableOpacity onPress={() => setPopupVisible(false)} style={styles.closeButton}>
+            <Text style={styles.closeButtonText}>Okay</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -21,36 +118,32 @@ export default function DrillsScreen() {
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
-          placeholder="Search"
+          placeholder="Search for a drill..."
+          value={query}
+          onChangeText={setQuery}
           placeholderTextColor="#aaa"
         />
+        <TouchableOpacity onPress={searchVideos} style={styles.searchIconContainer}>
+          {/* Replace with your search icon or use a vector icon library */}
+          <Image
+            source={require('@/assets/images/search_icon.png')} // Your search icon image path
+            style={styles.searchIcon}
+          />
+        </TouchableOpacity>
       </View>
 
       {/* Drills List */}
       <ScrollView contentContainerStyle={styles.drillList}>
-        {/* Drill Item 1 */}
-        <TouchableOpacity style={styles.drillItem}>
-          <Image source={require('../../assets/images/d1.jpg')} style={styles.drillThumbnail} />
-          <View style={styles.drillDetails}>
-            <Text style={styles.drillTitle}>How to bowl Inswing - Brett Lee</Text>
-          </View>
-        </TouchableOpacity>
-
-        {/* Drill Item 2 */}
-        <TouchableOpacity style={styles.drillItem}>
-          <Image source={require('../../assets/images/d2.jpg')} style={styles.drillThumbnail} />
-          <View style={styles.drillDetails}>
-            <Text style={styles.drillTitle}>How to inswing tapeball - Arsl</Text>
-          </View>
-        </TouchableOpacity>
-
-        {/* Drill Item 3 */}
-        <TouchableOpacity style={styles.drillItem}>
-          <Image source={require('../../assets/images/d3.jpg')} style={styles.drillThumbnail} />
-          <View style={styles.drillDetails}>
-            <Text style={styles.drillTitle}>How to put reverse swing - cricket tag</Text>
-          </View>
-        </TouchableOpacity>
+        {videos.map((video) => (
+          <TouchableOpacity key={video.id.videoId} onPress={() => openVideo(video.id.videoId)} style={styles.drillItem}>
+            <Image
+              source={{ uri: video.snippet.thumbnails.default.url }}
+              style={styles.drillThumbnail}
+              resizeMode='cover'
+            />
+            <Text style={styles.drillTitle}>{video.snippet.title}</Text>
+          </TouchableOpacity>
+        ))}
       </ScrollView>
 
       {/* Navbar */}
@@ -88,6 +181,35 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#121212', // Dark background for the drills section
   },
+  popup: {
+    position: 'absolute',
+    top: 220,
+    left: 20,
+    right: 20,
+    backgroundColor: '#333',
+    padding: 25,
+    borderRadius: 10,
+    zIndex: 1000,
+  },
+  popupText: {
+    color: 'lightgrey',
+    fontSize: 16,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  closeButton: {
+    backgroundColor: '#005B41',
+    padding: 10,
+    width:'50%',
+    borderRadius:10,
+    justifyContent: 'center',
+    alignSelf: 'center',
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    color: 'lightgrey',
+    fontWeight: 'bold',
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -97,18 +219,20 @@ const styles = StyleSheet.create({
   backIcon: {
     width: 24,
     height: 24,
-    marginLeft:15,
+    marginLeft: 15,
     tintColor: '#fff',
   },
   headerText: {
     flex: 1,
     fontSize: 30,
-    paddingRight:35,
+    paddingRight: 35,
     fontWeight: 'bold',
     color: '#fff',
     textAlign: 'center',
   },
   searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center', // Center align items vertically
     paddingHorizontal: 15,
     paddingVertical: 25,
     backgroundColor: '#005B41',
@@ -116,35 +240,41 @@ const styles = StyleSheet.create({
   searchInput: {
     backgroundColor: '#1e1e1e',
     borderRadius: 20,
-    height:35,
+    height: 45,
+    flex: 1, // Allow input to take up available space
     paddingHorizontal: 15,
-    color: '#000',
+    color: 'lightgrey',
+  },
+  searchIconContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 10, // Spacing between input and icon
+  },
+  searchIcon: {
+    width: 24, // Adjust the width of the icon as needed
+    height: 24, // Adjust the height of the icon as needed
   },
   drillList: {
     paddingHorizontal: 15,
-    paddingVertical:10
+    backgroundColor: '#121212', // Dark background for the drills list
+    paddingVertical: 10,
+    paddingBottom: 100, // Extra padding to prevent navbar overlap
   },
   drillItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#1c1c1c',
-    padding: 15,
-    marginVertical: 5,
-    borderRadius: 10,
+    flexDirection: 'row', // Align image and text horizontally
+    alignItems: 'center', // Center items vertically
+    marginVertical: 5, // Spacing between items
+    paddingVertical: 10,
   },
   drillThumbnail: {
-    width: 100,
-    height: 50,
-    borderRadius: 10,
-  },
-  drillDetails: {
-    flex: 1,
-    marginLeft: 20,
+    width: 155,
+    height: 90,
+    borderRadius: 10, // Rounded corners for image
   },
   drillTitle: {
-    fontSize: 16,
-    fontWeight: 'normal',
-    color: '#fff',
+    color: 'lightgrey', 
+    marginLeft: 15,
+    flex:1, 
   },
   navbar: {
     flexDirection: 'row',

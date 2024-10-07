@@ -7,13 +7,14 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
-  Alert,
+  ActivityIndicator,
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import RNPickerSelect from "react-native-picker-select";
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { db } from '@/firebaseConfig';
 import { collection, query, where, getDocs } from "firebase/firestore";
+import CustomAlert from "@/components/CustomAlert";
 
 export default function Login() {
   const router = useRouter();
@@ -21,13 +22,19 @@ export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
 
 
   const handleLogin = async () => {
     if (!username || !password || !role) {
-      Alert.alert("Error", "Please fill all fields");
+      setAlertMessage("Please fill all fields");
+      setAlertVisible(true);
       return;
     }
+
+    setLoading(true);
 
     try {
       let collectionName = "";
@@ -46,7 +53,9 @@ export default function Login() {
           collectionName = "clubOwner";
           break;
         default:
-          Alert.alert("Error", "Invalid role selected");
+          setAlertMessage("Invalid role selected");
+          setAlertVisible(true);
+          setLoading(false);
           return;
       }
 
@@ -63,21 +72,36 @@ export default function Login() {
         const userData = querySnapshot.docs[0].data();
         console.log("UserData: ", userData);
         await AsyncStorage.setItem("userData", JSON.stringify(userData));
-        
-        Alert.alert("Success", "Login successful!, welcome " + username);
-        router.push("/PlayerHomePage"); 
+        setAlertMessage("Welcome " + username + "!");
+        setAlertVisible(true);
+        setTimeout(() => {
+          router.push("/PlayerHomePage");
+        }, 1000);
       } else {
-        
-        Alert.alert("Error", "Invalid username or password");
+        setAlertMessage("Invalid username or password!");
+        setAlertVisible(true);
       }
     } catch (error) {
       console.error("Error logging in: ", error);
-      Alert.alert("Error", "Login failed");
+      setAlertMessage("Login failed");
+      setAlertVisible(true);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const handleAlertConfirm = () => {
+    setAlertVisible(false);
   };
 
   return (
     <View style={styles.container}>
+      {loading ? ( 
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator size='large' color='#005B41' />
+        </View>
+      ) : (
+        <>
       <Image
         source={require("@/assets/images/logo.png")} // Make sure to add your logo image in assets
         style={styles.logo}
@@ -145,6 +169,14 @@ export default function Login() {
           <Text style={styles.signupButton}>Create account</Text>
         </TouchableOpacity>
       </View>
+      </>
+      )}
+       <CustomAlert 
+        visible={alertVisible} 
+        message={alertMessage} 
+        onConfirm={handleAlertConfirm} 
+        onCancel={handleAlertConfirm}
+      />
     </View>
   );
 }
@@ -155,6 +187,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#121212",
     alignItems: "center",
     justifyContent: "center",
+  },
+  loaderContainer: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Semi-transparent background
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex:1000,
   },
   logo: {
     width: 200,
